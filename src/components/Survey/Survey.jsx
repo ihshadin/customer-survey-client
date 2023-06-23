@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import QuestionCard from '../QuestionCard/QuestionCard';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Survey = () => {
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState(new Array(questions.length).fill(null));
+    const navigate = useNavigate();
 
     const handleNext = () => {
         if (currentQuestion < questions.length - 1) {
@@ -39,10 +40,13 @@ const Survey = () => {
             updatedSelectedOptions[currentQuestion] = answer;
             setSelectedOptions(updatedSelectedOptions);
         }
-
-        // Save answers in localStorage
-        localStorage.setItem('surveyAnswers', JSON.stringify(answers));
     };
+
+    const handleSubmitSurvey = () => {
+        localStorage.setItem('surveyAnswers', JSON.stringify(answers));
+
+        navigate('/survey/thank-you');
+    }
 
     // Questions Data
     useEffect(() => {
@@ -90,7 +94,7 @@ const Survey = () => {
                                 name="feedback"
                                 id="feedback"
                                 placeholder='Input your feedback!'
-                                onChange={handleAnswer}
+                                onBlur={handleAnswer}
                             />
                         )
                     }
@@ -113,13 +117,26 @@ const Survey = () => {
                                 Next
                             </button>
                         ) : (
-                            <button
-                                className="btn min-h-0 h-auto px-8 py-3 rounded-none bg-teal-500 text-white hover:bg-teal-500"
-                                disabled={currentQuestion !== (questions.length - 1)}
-                                onClick={() => console.log(answers)}
-                            >
-                                Submit
-                            </button>
+                            <>
+                                <button
+                                    className="btn min-h-0 h-auto px-8 py-3 rounded-none bg-teal-500 text-white hover:bg-teal-500"
+                                    disabled={currentQuestion !== (questions.length - 1)}
+                                    onClick={() => window.my_modal_3.showModal()}
+                                >
+                                    Next
+                                </button>
+                                <dialog id="my_modal_3" className="modal">
+                                    <form method="dialog" className="modal-box">
+                                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                        <h3 className="font-bold text-2xl mb-5">Are you sure!</h3>
+                                        <p className="mb-5">Do you want submit the survey?</p>
+                                        <Link
+                                            className="btn min-h-0 h-auto px-8 py-3 rounded-none bg-teal-500 text-white hover:bg-teal-500"
+                                            onClick={handleSubmitSurvey}
+                                        >Submit</Link>
+                                    </form>
+                                </dialog>
+                            </>
                         )
                     }
                 </div>
